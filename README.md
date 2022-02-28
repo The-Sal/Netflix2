@@ -10,5 +10,8 @@ Prerequisites:
 
 
 
-Small app desgined to parse episodes from streaming site "https://watchmovie.cc/", built for educational purposes; proof of concept of a Python+Swift app)
+Small app desgined to parse episodes from streaming site "https://watchmovie.cc/", built for educational purposes; proof of concept of a Python+Swift app).
 
+
+
+Find compiled version under releases.
