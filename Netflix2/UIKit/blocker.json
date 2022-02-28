@@ -1,0 +1,12 @@
+[
+    {
+        "trigger": {
+                "url-filter": ".*",
+                "resource-type": ["image", "popup", "ping", "other"],
+                "unless-domain": ["player.voxzer.org"]
+        },
+        "action": {
+                "type": "block"
+        }
+    }
+]

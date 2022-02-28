@@ -1,0 +1,103 @@
+#! /usr/local/bin/py
+import sys
+import json
+from utils.thread_helpers import thread
+from utils.networking import requests_session
+session = requests_session()
+
+
+def extractName(url):
+    http, blank, domain, series, nameAndSeason = url.split('/')
+    nameAndSeasonDirty = nameAndSeason.split('-')
+
+    if not domain == 'watchmovie.cc':
+        raise Exception('Not a valid watchmovie.cc url')
+
+    name = str()
+    season = str()
+
+    seasonKeyFound = False
+
+    for item in nameAndSeasonDirty:
+        if item == 'season':
+            seasonKeyFound = True
+            season = item + ' '
+            continue
+
+        if seasonKeyFound:
+            season += item
+            break
+
+        name += item + ' '
+
+
+
+    return name.strip(), season.strip()
+
+
+def extractSBURL(html):
+    return html.split('<li class="streamsb">')[1].split('</li>')[0].split('data-video="')[1].split('"')[0]
+
+
+try:
+    inputURL = list(sys.argv)[1]
+except IndexError:
+    inputURL = 'https://watchmovie.cc/series/family-guy-season-5-res'
+
+
+showName, showSeason = extractName(inputURL)
+
+
+urls = {}
+
+possibleEpisodes = 1000
+
+
+attempts = 5
+episodesCaptured = 0
+
+threads = []
+
+for i in range(possibleEpisodes):
+
+    i = i + 1
+
+    episodeURL = inputURL + '-episode-' + str(i)
+
+
+    episodeHTML = session.get(episodeURL)
+
+    code = episodeHTML.status_code
+
+    if code == 404:
+        attempts -= 1
+
+    if attempts <= 0:
+        break
+
+    def core():
+        global episodesCaptured, urls, i
+        try:
+            sbURL = extractSBURL(episodeHTML.text)
+            urls[i] = sbURL
+            episodesCaptured = len(urls)
+        except IndexError:
+            pass
+
+    threads.append(thread(core))
+
+for t in threads:
+    t.join()
+
+urls.update({
+    'showName': str(showName),
+    'showSeason': str(showSeason),
+    'episodes': str(episodesCaptured)
+})
+
+print(json.dumps(urls))
+
+
+
+if __name__ == '__main__':
+    pass
