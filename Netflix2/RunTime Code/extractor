@@ -3,6 +3,7 @@ import sys
 import json
 from utils.thread_helpers import thread
 from utils.networking import requests_session
+
 session = requests_session()
 
 
@@ -30,8 +31,6 @@ def extractName(url):
 
         name += item + ' '
 
-
-
     return name.strip(), season.strip()
 
 
@@ -44,14 +43,11 @@ try:
 except IndexError:
     inputURL = 'https://watchmovie.cc/series/family-guy-season-5-res'
 
-
 showName, showSeason = extractName(inputURL)
-
 
 urls = {}
 
 possibleEpisodes = 1000
-
 
 attempts = 5
 episodesCaptured = 0
@@ -78,6 +74,13 @@ for i in range(possibleEpisodes):
     def core():
         global episodesCaptured, urls, i
         try:
+            url = 'https://' + \
+                  episodeHTML.text.split('<div id="load_video"></div>')[1].split('</div>')[0].split('<iframe src="')[
+                      1].split('"')[0].split('//')[1]
+
+
+            # sbURL = url
+            # Switch to other URL by commenting the line below and uncommenting the line above
             sbURL = extractSBURL(episodeHTML.text)
             urls[i] = sbURL
             episodesCaptured = len(urls)
@@ -96,8 +99,6 @@ urls.update({
 })
 
 print(json.dumps(urls))
-
-
 
 if __name__ == '__main__':
     pass

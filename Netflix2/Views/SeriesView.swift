@@ -16,54 +16,48 @@ struct SeriesView: View {
     let seriesURL: String
     @State var availEpisodes = [episode]()
     @State var loading = true
-    @State var loadingText = "Parsing   "
     
     @State var showError = false
     @State var errorShow = [String]()
     
     var body: some View {
         if loading{
-            Text(loadingText).bold()
-                .onAppear {
-                    DispatchQueue.global().async {
-                        
+            
+            VStack{
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .onAppear {
                         DispatchQueue.global().async {
-                            while loading{
-                                loadingText += "."
-                                if loadingText == "Parsing...."{
-                                    loadingText = "Parsing   "
+                            let possibleEpisodes = extractors().newExtractor(url: seriesURL)
+                            
+                            if possibleEpisodes == nil{
+                                showError = true
+                                errorShow.append(commonErr.unableToParse)
+                                loading = false
+                            }else{
+                                let eps = possibleEpisodes!.episodes
+                                for key in eps.keys{
+                                    availEpisodes.append(episode(episodeNumber: key,
+                                                                 episodeURL: URL(string: eps[key]!)!))
                                 }
-                                sleep(1)
-                            }
-                        }
-                        
-                        
-                        //let possibleEps = extractors().getURL(url: seriesURL)
-                        let possibleEpisodes = extractors().newExtractor(url: seriesURL)
-                        
-                        if possibleEpisodes == nil{
-                            showError = true
-                            errorShow.append(commonErr.unableToParse)
-                            loading = false
-                        }else{
-                            let eps = possibleEpisodes!.episodes
-                            for key in eps.keys{
-                                availEpisodes.append(episode(episodeNumber: key,
-                                                             episodeURL: URL(string: eps[key]!)!))
+                                
+                                
+                                availEpisodes = availEpisodes.sorted { ep1, ep2 in
+                                    Int(ep1.episodeNumber)! < Int(ep2.episodeNumber)!
+                                }
+                                
+                                loading = false
                             }
                             
-                            
-                            availEpisodes = availEpisodes.sorted { ep1, ep2 in
-                                Int(ep1.episodeNumber)! < Int(ep2.episodeNumber)!
-                            }
-                            
-                            loading = false
-                        }
-                        
 
+                        }
+                        
                     }
-                    
-                }
+                Text("")
+                Text("Parsing Episodes...")
+                    .font(.footnote)
+            }
+                
         }else if showError{
             ErrorView(error: errorShow[0])
         }else{
@@ -90,8 +84,6 @@ struct SeriesView: View {
                             }
                         }
         }
-        
-        
     }
 }
 
