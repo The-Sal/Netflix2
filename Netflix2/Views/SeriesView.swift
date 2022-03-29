@@ -26,36 +26,36 @@ struct SeriesView: View {
             VStack{
                 ProgressView()
                     .progressViewStyle(.circular)
-                    .onAppear {
-                        DispatchQueue.global().async {
-                            let possibleEpisodes = extractors().newExtractor(url: seriesURL)
-                            
-                            if possibleEpisodes == nil{
-                                showError = true
-                                errorShow.append(commonErr.unableToParse)
-                                loading = false
-                            }else{
-                                let eps = possibleEpisodes!.episodes
-                                for key in eps.keys{
-                                    availEpisodes.append(episode(episodeNumber: key,
-                                                                 episodeURL: URL(string: eps[key]!)!))
-                                }
-                                
-                                
-                                availEpisodes = availEpisodes.sorted { ep1, ep2 in
-                                    Int(ep1.episodeNumber)! < Int(ep2.episodeNumber)!
-                                }
-                                
-                                loading = false
-                            }
-                            
-
-                        }
-                        
-                    }
                 Text("")
                 Text("Parsing Episodes...")
                     .font(.footnote)
+            }                    .onAppear {
+                print("Circular View on!")
+                DispatchQueue.global().async {
+                    let possibleEpisodes = extractors().newExtractor(url: seriesURL)
+                    
+                    if possibleEpisodes == nil{
+                        showError = true
+                        errorShow.append(commonErr.unableToParse)
+                        loading = false
+                    }else{
+                        let eps = possibleEpisodes!.episodes
+                        for key in eps.keys{
+                            availEpisodes.append(episode(episodeNumber: key,
+                                                         episodeURL: URL(string: eps[key]!)!))
+                        }
+                        
+                        
+                        availEpisodes = availEpisodes.sorted { ep1, ep2 in
+                            Int(ep1.episodeNumber)! < Int(ep2.episodeNumber)!
+                        }
+                        
+                        loading = false
+                    }
+                    
+
+                }
+                
             }
                 
         }else if showError{
