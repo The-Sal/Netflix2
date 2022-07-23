@@ -11,8 +11,6 @@ def extractName(url):
     http, blank, domain, series, nameAndSeason = url.split('/')
     nameAndSeasonDirty = nameAndSeason.split('-')
 
-    if not domain == 'watchmovie.cc':
-        raise Exception('Not a valid watchmovie.cc url')
 
     name = str()
     season = str()

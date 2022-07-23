@@ -17,6 +17,37 @@ struct episode: Identifiable{
     var id = UUID()
     let episodeNumber: String
     let episodeURL: URL
+    
+    func episodeName() -> String{
+        let parts = String(episodeURL.absoluteString.split(separator: "/")[6])
+        var remove = true
+        var firstItem = true
+        var title = String()
+        
+        for item in parts.split(separator: "-"){
+            if !remove{
+                if firstItem{
+                    title = "(\(item))"
+                    firstItem = false
+                }else{
+                    title += item + " "
+                }
+
+                
+            }
+            
+            if item.contains("episode"){
+                remove = false
+            }
+            
+        }
+        
+        
+        return title
+        
+        
+    }
+    
 }
 
 struct series : Identifiable{
