@@ -40,9 +40,15 @@ struct SeriesView: View {
                         loading = false
                     }else{
                         let eps = possibleEpisodes!.episodes
+                        
                         for key in eps.keys{
-                            availEpisodes.append(episode(episodeNumber: key,
-                                                         episodeURL: URL(string: eps[key]!)!))
+                            if let episodeStringURL = eps[key]{
+                                availEpisodes.append(episode(episodeNumber: key,
+                                                             episodeURL: URL(string: episodeStringURL) ?? URL(string: "https://google.com")!))
+                            }else{
+                                print("Unable to add episode url for key", key)
+                            }
+                            
                         }
                         
                         
